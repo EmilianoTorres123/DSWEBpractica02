@@ -72,5 +72,23 @@ if (isset($_GET['eliminar']) && isset($_SESSION['registros'][$_GET['eliminar']])
         <input type="submit" name="submit" value="Enviar Formulario"><br>
     </form>
     
+    <?php
+
+    echo "Los registros son: <br>";
+    echo "<table border='1'>";
+    echo "<tr><th>Clave</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Acciones</th></tr>";
+    foreach ($_SESSION['registros'] as $key => $registro) {
+        echo "<tr>";
+        echo "<td><a href=\"{$_SERVER['PHP_SELF']}?ver={$index}\">{$registro['Clave']}</a></td>";
+        echo "<td>{$registro['Nombre']}</td>";
+        echo "<td>{$registro['Dirección']}</td>";
+        echo "<td>{$registro['Teléfono']}</td>";
+        echo "<td><a href=\"{$_SERVER['PHP_SELF']}?eliminar={$index}\">Eliminar</a></td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+
+    ?>
+    
 </body>
 </html>
