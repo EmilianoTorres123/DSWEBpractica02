@@ -1,3 +1,53 @@
+<?php
+session_start();
+
+function mostrarDetalles($registro) {
+    echo "<h2>Detalles del Registro</h2>";
+    echo "<p><strong>Clave:</strong> {$registro['Clave']}</p>";
+    echo "<p><strong>Nombre:</strong> {$registro['Nombre']}</p>";
+    echo "<p><strong>Dirección:</strong> {$registro['Dirección']}</p>";
+    echo "<p><strong>Teléfono:</strong> {$registro['Teléfono']}</p>";
+}
+
+if (isset($_POST['submit'])) {
+    $registro = array(
+        'Clave' => $_POST['clave'],
+        'Nombre' => $_POST['name'],
+        'Dirección' => $_POST['direccion'],
+        'Teléfono' => $_POST['telefono']
+    );
+
+
+    if (isset($_SESSION['registros'])) {
+        $_SESSION['registros'][] = $registro;
+    } else {
+        //
+        $_SESSION['registros'] = array($registro);
+    }
+}
+
+ 
+$clave = "";
+$nombre = "";
+$direccion = "";
+$telefono = "";
+
+if (isset($_GET['ver']) && isset($_SESSION['registros'][$_GET['ver']])) {
+    $registro = $_SESSION['registros'][$_GET['ver']];
+    $clave = $registro['Clave'];
+    $nombre = $registro['Nombre'];
+    $direccion = $registro['Dirección'];
+    $telefono = $registro['Teléfono'];
+}
+
+
+if (isset($_GET['eliminar']) && isset($_SESSION['registros'][$_GET['eliminar']])) {
+    unset($_SESSION['registros'][$_GET['eliminar']]);
+
+    $_SESSION['registros'] = array_values($_SESSION['registros']);
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
