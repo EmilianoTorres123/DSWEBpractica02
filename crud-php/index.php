@@ -92,3 +92,40 @@ try {
     </form>
 
     <?php
+    if (!empty($registros)) {
+        echo "Los registros son:<br>";
+        echo "<table border='1'>";
+        echo "<tr><th>Clave</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Acciones</th></tr>";
+        foreach ($registros as $index => $registro) {
+            echo "<tr>";
+            echo "<td><a href=\"javascript:void(0);\" onclick=\"consultarRegistro('{$registro['clave']}');\">{$registro['clave']}</a></td>";
+            echo "<td>{$registro['nombre']}</td>";
+            echo "<td>{$registro['direccion']}</td>";
+            echo "<td>{$registro['telefeno']}</td>";
+            echo "<td><a href=\"javascript:void(0);\" onclick=\"confirmarEliminar('{$registro['clave']}');\">Eliminar</a></td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No hay registros.";
+    }
+    ?>
+
+    <script>
+    function consultarRegistro(clave) {
+        
+        <?php
+        if (!empty($registros)) {
+            echo "var registros = " . json_encode($registros) . ";\n";
+            echo "for (var i = 0; i < registros.length; i++) {\n";
+            echo "if (registros[i].clave == clave) {\n";
+            echo "document.getElementsByName('clave')[0].value = registros[i].clave;\n";
+            echo "document.getElementsByName('name')[0].value = registros[i].nombre;\n";
+            echo "document.getElementsByName('direccion')[0].value = registros[i].direccion;\n";
+            echo "document.getElementsByName('telefono')[0].value = registros[i].telefeno;\n";
+            echo "}\n";
+            echo "}\n";
+        }
+        ?>
+
+    }
