@@ -129,3 +129,27 @@ try {
         ?>
 
     }
+    function confirmarEliminar(clave) {
+        var confirmacion = confirm("¿quieres eliminar este empleado?");
+
+        if (confirmacion) {
+            window.location.href = "<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?eliminar=" + clave;
+        } else {
+            
+        }
+    }
+    function validarFormulario() {
+        var clave = document.getElementById("clave").value;
+        var nombre = document.getElementById("name").value;
+        var direccion = document.getElementById("direccion").value;
+        var telefono = document.getElementById("telefono").value;
+
+        if (clave === "" || nombre === "" || direccion === "" || telefono === "") {
+            alert("Completa todos los campos.");
+            return false; 
+        }
+        return true; 
+    }
+    </script>
+</body>
+</html>
