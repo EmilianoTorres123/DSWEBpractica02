@@ -1,50 +1,71 @@
 <?php
 session_start();
 
-function mostrarDetalles($registro) {
-    echo "<h2>Detalles del Registro</h2>";
-    echo "<p><strong>Clave:</strong> {$registro['Clave']}</p>";
-    echo "<p><strong>Nombre:</strong> {$registro['Nombre']}</p>";
-    echo "<p><strong>Dirección:</strong> {$registro['Dirección']}</p>";
-    echo "<p><strong>Teléfono:</strong> {$registro['Teléfono']}</p>";
-}
+try {
+    $dsn = "pgsql:host=172.17.0.3;port=5432;dbname=ejemplo;";
+    $username = "postgres";
+    $password = "postgres";
 
-if (isset($_POST['submit'])) {
-    $registro = array(
-        'Clave' => $_POST['clave'],
-        'Nombre' => $_POST['name'],
-        'Dirección' => $_POST['direccion'],
-        'Teléfono' => $_POST['telefono']
-    );
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    if (isset($_POST['submit'])) {
+        
+        $query = "INSERT INTO empleado(clave, nombre, direccion, telefeno)
+                  VALUES(:clave, :nombre, :direccion, :telefeno)";
 
-    if (isset($_SESSION['registros'])) {
-        $_SESSION['registros'][] = $registro;
-    } else {
-        //
-        $_SESSION['registros'] = array($registro);
+        $statement = $pdo->prepare($query);
+
+        $parameters = [
+            ':clave' => $_POST['clave'],
+            ':nombre' => $_POST['name'],
+            ':direccion' => $_POST['direccion'],
+            ':telefeno' => $_POST['telefono']
+        ];
+
+        $result = $statement->execute($parameters);
+
+        if ($result) {
+            echo "Se registró el empleado.";
+
+            $_POST['clave'] = '';
+            $_POST['name'] = '';
+            $_POST['direccion'] = '';
+            $_POST['telefono'] = '';
+        } else {
+            echo "Error en la consulta.";
+        }
     }
-}
 
- 
-$clave = "";
-$nombre = "";
-$direccion = "";
-$telefono = "";
+    if (isset($_GET['eliminar'])) {
+        
+        $claveEliminar = $_GET['eliminar'];
 
-if (isset($_GET['ver']) && isset($_SESSION['registros'][$_GET['ver']])) {
-    $registro = $_SESSION['registros'][$_GET['ver']];
-    $clave = $registro['Clave'];
-    $nombre = $registro['Nombre'];
-    $direccion = $registro['Dirección'];
-    $telefono = $registro['Teléfono'];
-}
+        if (is_numeric($claveEliminar)) {
+            $query = "DELETE FROM empleado WHERE clave = :clave";
+            $statement = $pdo->prepare($query);
+            $statement->bindParam(':clave', $claveEliminar, PDO::PARAM_INT);
+            $result = $statement->execute();
 
+            if ($result) {
+                echo "Se eliminó el empleado con clave: $claveEliminar";
+            } else {
+                echo "Error al eliminar el empleado.";
+            }
+        } else {
+            echo "Clave de empleado no válida.";
+        }
+    }
 
-if (isset($_GET['eliminar']) && isset($_SESSION['registros'][$_GET['eliminar']])) {
-    unset($_SESSION['registros'][$_GET['eliminar']]);
+    
+    $consulta = "SELECT * FROM empleado";
+    $stmt = $pdo->query($consulta);
+    $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $_SESSION['registros'] = array_values($_SESSION['registros']);
+    
+    $pdo = null;
+} catch (PDOException $e) {
+    echo "Error de conexión: " . $e->getMessage();
 }
 ?>
 
@@ -54,41 +75,20 @@ if (isset($_GET['eliminar']) && isset($_SESSION['registros'][$_GET['eliminar']])
     <title>Equipo 4</title>
 </head>
 <body>
-
-
-    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" onsubmit="return validarFormulario();">
         <label for="clave">Clave:</label>
-        <input type="number" name="clave" required value="<?php echo $clave; ?>"><br>
+        <input type="number" name="clave" id="clave" required value="<?php echo isset($_POST['clave']) ? htmlspecialchars($_POST['clave']) : ''; ?>"><br>
 
         <label for="name">Nombre:</label>
-        <input type="text" name="name" required value="<?php echo $nombre; ?>"><br>
+        <input type="text" name="name" id="name" required value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>"><br>
 
         <label for="direccion">Dirección:</label>
-        <input type="text" name="direccion" required value="<?php echo $direccion; ?>"><br>
+        <input type="text" name="direccion" id="direccion" required value="<?php echo isset($_POST['direccion']) ? htmlspecialchars($_POST['direccion']) : ''; ?>"><br>
 
         <label for="telefono">Teléfono:</label>
-        <input type="text" name="telefono" required value="<?php echo $telefono; ?>"><br>
+        <input type="text" name="telefono" id="telefono" required value="<?php echo isset($_POST['telefono']) ? htmlspecialchars($_POST['telefono']) : ''; ?>"><br>
 
         <input type="submit" name="submit" value="Enviar Formulario"><br>
     </form>
-    
+
     <?php
-
-    echo "Los registros son: <br>";
-    echo "<table border='1'>";
-    echo "<tr><th>Clave</th><th>Nombre</th><th>Dirección</th><th>Teléfono</th><th>Acciones</th></tr>";
-    foreach ($_SESSION['registros'] as $key => $registro) {
-        echo "<tr>";
-        echo "<td><a href=\"{$_SERVER['PHP_SELF']}?ver={$index}\">{$registro['Clave']}</a></td>";
-        echo "<td>{$registro['Nombre']}</td>";
-        echo "<td>{$registro['Dirección']}</td>";
-        echo "<td>{$registro['Teléfono']}</td>";
-        echo "<td><a href=\"{$_SERVER['PHP_SELF']}?eliminar={$index}\">Eliminar</a></td>";
-        echo "</tr>";
-    }
-    echo "</table>";
-
-    ?>
-    
-</body>
-</html>
