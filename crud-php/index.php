@@ -36,4 +36,37 @@ try {
             echo "Error en el registro.";
         }
     }
+
+    if (isset($_POST['submit_login'])) {
+        $email = $_POST['email_login'];
+        $contraseña = $_POST['contraseña_login'];
+
+        $query = "SELECT * FROM usuarios WHERE email = :email";
+        $statement = $pdo->prepare($query);
+        $statement->bindParam(':email', $email, PDO::PARAM_STR);
+        $statement->execute();
+        $usuarioEncontrado = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuarioEncontrado && password_verify($contraseña, $usuarioEncontrado['contraseña'])) {
+            // Inicio de sesión exitoso
+            $_SESSION['usuario'] = $usuarioEncontrado['nombre'];
+            header('Location: alta.php');
+            exit();
+        } else {
+            // Credenciales incorrectas, mostrar mensaje de error
+            $login_error = "Credenciales incorrectas. Inténtalo de nuevo.";
+        }
+    }
+
+    // Consulta de empleados
+    $consulta = "SELECT * FROM empleado";
+    $stmt = $pdo->query($consulta);
+    $registros = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $pdo = null;
+} catch (PDOException $e) {
+    echo "Error de conexión: " . $e->getMessage();
 }
+?>
+
+
