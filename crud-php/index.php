@@ -69,4 +69,45 @@ try {
 }
 ?>
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Equipo 4</title>
+</head>
+<body>
+    <?php
+    if (isset($_SESSION['usuario'])) {
+        // Usuario autenticado, mostrar formulario de registro de empleados
+        echo "<form method='post' action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' onsubmit='return validarFormulario();'>";
+        // Formulario de registro de empleados aquí
+        echo "</form>";
+    } else {
+        // Usuario no autenticado, mostrar formulario de inicio de sesión y registro de usuario
+        echo "<h2>Iniciar Sesión</h2>";
+        echo "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='POST'>";
+        echo "<label for='email_login'>Email:</label>";
+        echo "<input type='email' name='email_login' required><br><br>";
+        echo "<label for='contraseña_login'>Contraseña:</label>";
+        echo "<input type='password' name='contraseña_login' required><br><br>";
+        echo "<input type='submit' name='submit_login' value='Iniciar Sesión'>";
+        echo "</form>";
 
+        echo "<h2>Registro de Usuario</h2>";
+        echo "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='POST'>";
+        echo "<label for='nombre'>Nombre:</label>";
+        echo "<input type='text' name='nombre' required><br><br>";
+        echo "<label for='email'>Email:</label>";
+        echo "<input type='email' name='email' required><br><br>";
+        echo "<label for='contraseña'>Contraseña:</label>";
+        echo "<input type='password' name='contraseña' required><br><br>";
+        echo "<input type='submit' name='submit_registro' value='Registrar'>";
+        echo "</form>";
+
+        if (isset($login_error)) {
+            echo "<p>$login_error</p>";
+        }
+    }
+    ?>
+    </script>
+</body>
+</html>
